@@ -1,9 +1,7 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import util
 from stripe.api_resources.account import Account
 from stripe.api_resources.abstract import UpdateableAPIResource
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class Person(UpdateableAPIResource):
@@ -18,7 +16,7 @@ class Person(UpdateableAPIResource):
         return "%s/%s/persons/%s" % (base, acct_extn, extn)
 
     @classmethod
-    def modify(cls, sid, **params):
+    async def modify(cls, sid, **params):
         raise NotImplementedError(
             "Can't modify a person without an account"
             "ID. Call save on account.persons.retrieve('person_id')"

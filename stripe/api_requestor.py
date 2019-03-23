@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import calendar
 import datetime
 import json
@@ -9,9 +7,9 @@ import uuid
 import warnings
 
 import stripe
-from stripe import error, oauth_error, http_client, version, util, six
+from stripe import error, oauth_error, http_client, version, util
 from stripe.multipart_data_generator import MultipartDataGenerator
-from stripe.six.moves.urllib.parse import urlencode, urlsplit, urlunsplit
+from urllib.parse import urlencode, urlsplit, urlunsplit
 from stripe.stripe_response import StripeResponse
 
 
@@ -26,13 +24,13 @@ def _encode_datetime(dttime):
 
 def _encode_nested_dict(key, data, fmt="%s[%s]"):
     d = {}
-    for subkey, subvalue in six.iteritems(data):
+    for subkey, subvalue in iter(data.items()):
         d[fmt % (key, subkey)] = subvalue
     return d
 
 
 def _api_encode(data):
-    for key, value in six.iteritems(data):
+    for key, value in iter(data.items()):
         key = util.utf8(key)
         if value is None:
             continue
@@ -114,8 +112,8 @@ class APIRequestor(object):
             str += " (%s)" % (info["url"],)
         return str
 
-    def request(self, method, url, params=None, headers=None):
-        rbody, rcode, rheaders, my_api_key = self.request_raw(
+    async def request(self, method, url, params=None, headers=None):
+        rbody, rcode, rheaders, my_api_key = await self.request_raw(
             method.lower(), url, params, headers
         )
         resp = self.interpret_response(rbody, rcode, rheaders)
@@ -138,7 +136,7 @@ class APIRequestor(object):
         # OAuth errors are a JSON object where `error` is a string. In
         # contrast, in API errors, `error` is a hash with sub-keys. We use
         # this property to distinguish between OAuth and API errors.
-        if isinstance(error_data, six.string_types):
+        if isinstance(error_data, str):
             err = self.specific_oauth_error(
                 rbody, rcode, resp, rheaders, error_data
             )
@@ -272,7 +270,7 @@ class APIRequestor(object):
 
         return headers
 
-    def request_raw(self, method, url, params=None, supplied_headers=None):
+    async def request_raw(self, method, url, params=None, supplied_headers=None):
         """
         Mechanism for issuing an API call
         """
@@ -329,7 +327,7 @@ class APIRequestor(object):
 
         headers = self.request_headers(my_api_key, method)
         if supplied_headers is not None:
-            for key, value in six.iteritems(supplied_headers):
+            for key, value in iter(supplied_headers.items()):
                 headers[key] = value
 
         util.log_info("Request to Stripe api", method=method, path=abs_url)
@@ -339,7 +337,7 @@ class APIRequestor(object):
             api_version=self.api_version,
         )
 
-        rbody, rcode, rheaders = self._client.request_with_retries(
+        rbody, rcode, rheaders = await self._client.request_with_retries(
             method, abs_url, headers, post_data
         )
 

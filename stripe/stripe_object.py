@@ -1,11 +1,9 @@
-from __future__ import absolute_import, division, print_function
-
 import datetime
 import json
 from copy import deepcopy
 
 import stripe
-from stripe import api_requestor, util, six
+from stripe import api_requestor, util
 
 
 def _compute_diff(current, previous):
@@ -217,7 +215,7 @@ class StripeObject(dict):
 
         self._transient_values = self._transient_values - set(values)
 
-        for k, v in six.iteritems(values):
+        for k, v in values:
             super(StripeObject, self).__setitem__(
                 k,
                 util.convert_to_stripe_object(
@@ -231,7 +229,7 @@ class StripeObject(dict):
     def api_base(cls):
         return None
 
-    def request(self, method, url, params=None, headers=None):
+    async def request(self, method, url, params=None, headers=None):
         if params is None:
             params = self._retrieve_params
         requestor = api_requestor.APIRequestor(
@@ -240,7 +238,7 @@ class StripeObject(dict):
             api_version=self.stripe_version,
             account=self.stripe_account,
         )
-        response, api_key = requestor.request(method, url, params, headers)
+        response, api_key = await requestor.request(method, url, params, headers)
 
         return util.convert_to_stripe_object(
             response, api_key, self.stripe_version, self.stripe_account
@@ -249,10 +247,10 @@ class StripeObject(dict):
     def __repr__(self):
         ident_parts = [type(self).__name__]
 
-        if isinstance(self.get("object"), six.string_types):
+        if isinstance(self.get("object"), str):
             ident_parts.append(self.get("object"))
 
-        if isinstance(self.get("id"), six.string_types):
+        if isinstance(self.get("id"), str):
             ident_parts.append("id=%s" % (self.get("id"),))
 
         unicode_repr = "<%s at %s> JSON: %s" % (
@@ -261,10 +259,7 @@ class StripeObject(dict):
             str(self),
         )
 
-        if six.PY2:
-            return unicode_repr.encode("utf-8")
-        else:
-            return unicode_repr
+        return unicode_repr
 
     def __str__(self):
         return json.dumps(
@@ -279,7 +274,7 @@ class StripeObject(dict):
 
     def to_dict_recursive(self):
         d = dict(self)
-        for k, v in six.iteritems(d):
+        for k, v in iter(d.items()):
             if isinstance(v, StripeObject):
                 d[k] = v.to_dict_recursive()
         return d
@@ -293,7 +288,7 @@ class StripeObject(dict):
         unsaved_keys = self._unsaved_values or set()
         previous = previous or self._previous or {}
 
-        for k, v in six.iteritems(self):
+        for k, v in iter(self.items()):
             if k == "id" or (isinstance(k, str) and k.startswith("_")):
                 continue
             elif isinstance(v, stripe.api_resources.abstract.APIResource):
@@ -324,7 +319,7 @@ class StripeObject(dict):
 
         copied._retrieve_params = self._retrieve_params
 
-        for k, v in six.iteritems(self):
+        for k, v in iter(self.items()):
             # Call parent's __setitem__ to avoid checks that we've added in the
             # overridden version that can throw exceptions.
             super(StripeObject, copied).__setitem__(k, v)
@@ -340,7 +335,7 @@ class StripeObject(dict):
         copied = self.__copy__()
         memo[id(self)] = copied
 
-        for k, v in six.iteritems(self):
+        for k, v in iter(self.items()):
             # Call parent's __setitem__ to avoid checks that we've added in the
             # overridden version that can throw exceptions.
             super(StripeObject, copied).__setitem__(k, deepcopy(v, memo))

@@ -1,12 +1,10 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import error, util
 from stripe.api_resources.account import Account
 from stripe.api_resources.customer import Customer
 from stripe.api_resources.abstract import UpdateableAPIResource
 from stripe.api_resources.abstract import DeletableAPIResource
 from stripe.api_resources.abstract import VerifyMixin
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class BankAccount(UpdateableAPIResource, DeletableAPIResource, VerifyMixin):
@@ -39,7 +37,7 @@ class BankAccount(UpdateableAPIResource, DeletableAPIResource, VerifyMixin):
         return "%s/%s/%s/%s" % (base, owner_extn, class_base, extn)
 
     @classmethod
-    def modify(cls, sid, **params):
+    async def modify(cls, sid, **params):
         raise NotImplementedError(
             "Can't modify a bank account without a customer or account ID. "
             "Call save on customer.sources.retrieve('bank_account_id') or "

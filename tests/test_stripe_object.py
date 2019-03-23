@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import datetime
 import json
 import pickle
@@ -192,7 +190,7 @@ class TestStripeObject(object):
         res = repr(obj)
 
         if six.PY2:
-            res = six.text_type(repr(obj), "utf-8")
+            res = str(repr(obj), "utf-8")
 
         assert u"<StripeObject \u4e00boo\u1f00" in res
         assert u"id=foo" in res

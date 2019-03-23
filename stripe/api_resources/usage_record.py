@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe.api_resources.abstract.api_resource import APIResource
 from stripe import api_requestor, util
 
@@ -8,7 +6,7 @@ class UsageRecord(APIResource):
     OBJECT_NAME = "usage_record"
 
     @classmethod
-    def create(
+    async def create(
         cls,
         api_key=None,
         idempotency_key=None,
@@ -26,7 +24,7 @@ class UsageRecord(APIResource):
         )
         url = "/v1/subscription_items/%s/usage_records" % subscription_item
         headers = util.populate_headers(idempotency_key)
-        response, api_key = requestor.request("post", url, params, headers)
+        response, api_key = await requestor.request("post", url, params, headers)
 
         return util.convert_to_stripe_object(
             response, api_key, stripe_version, stripe_account

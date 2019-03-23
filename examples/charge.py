@@ -1,19 +1,21 @@
-from __future__ import absolute_import, division, print_function
-
 import os
+import asyncio
 
 import stripe
 
-
+loop = asyncio.get_event_loop()
 stripe.api_key = os.environ.get("STRIPE_SECRET_KEY")
 
-print("Attempting charge...")
+async def run_charge():
+    print("Attempting charge...")
 
-resp = stripe.Charge.create(
-    amount=200,
-    currency="usd",
-    card="tok_visa",
-    description="customer@gmail.com",
-)
+    resp = await stripe.Charge.create(
+        amount=200,
+        currency="usd",
+        card="tok_visa",
+        description="customer@gmail.com",
+    )
 
-print("Success: %r" % (resp))
+    print("Success: %r" % (resp))
+
+loop.run_until_complete(run_charge())

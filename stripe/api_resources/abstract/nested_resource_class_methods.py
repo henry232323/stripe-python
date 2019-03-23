@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import api_requestor, util
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 def nested_resource_class_methods(resource, path=None, operations=None):
@@ -24,7 +22,7 @@ def nested_resource_class_methods(resource, path=None, operations=None):
         resource_url_method = "%ss_url" % resource
         setattr(cls, resource_url_method, classmethod(nested_resource_url))
 
-        def nested_resource_request(
+        async def nested_resource_request(
             cls,
             method,
             url,
@@ -38,7 +36,7 @@ def nested_resource_class_methods(resource, path=None, operations=None):
                 api_key, api_version=stripe_version, account=stripe_account
             )
             headers = util.populate_headers(idempotency_key)
-            response, api_key = requestor.request(method, url, params, headers)
+            response, api_key = await requestor.request(method, url, params, headers)
             return util.convert_to_stripe_object(
                 response, api_key, stripe_version, stripe_account
             )

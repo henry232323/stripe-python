@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import api_requestor, util
 from stripe.api_resources.abstract import DeletableAPIResource
 
@@ -8,7 +6,7 @@ class EphemeralKey(DeletableAPIResource):
     OBJECT_NAME = "ephemeral_key"
 
     @classmethod
-    def create(
+    async def create(
         cls,
         api_key=None,
         idempotency_key=None,
@@ -28,7 +26,7 @@ class EphemeralKey(DeletableAPIResource):
 
         url = cls.class_url()
         headers = util.populate_headers(idempotency_key)
-        response, api_key = requestor.request("post", url, params, headers)
+        response, api_key = await requestor.request("post", url, params, headers)
         return util.convert_to_stripe_object(
             response, api_key, stripe_version, stripe_account
         )

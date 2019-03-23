@@ -1,15 +1,17 @@
-from __future__ import absolute_import, division, print_function
-
 import atexit
 import os
 import sys
 from distutils.version import StrictVersion
 
-import pytest
+try:
+    import pytest
+except:
+    f = lambda x: None
+    f.fixture = lambda *args, **kwargs: lambda i: i
 
 import stripe
-from stripe.six.moves.urllib.request import urlopen
-from stripe.six.moves.urllib.error import HTTPError
+from urllib.request import urlopen
+from urllib.error import HTTPError
 
 from tests.request_mock import RequestMock
 from tests.stripe_mock import StripeMock

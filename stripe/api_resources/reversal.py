@@ -1,9 +1,7 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import util
 from stripe.api_resources.transfer import Transfer
 from stripe.api_resources.abstract import UpdateableAPIResource
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class Reversal(UpdateableAPIResource):
@@ -18,7 +16,7 @@ class Reversal(UpdateableAPIResource):
         return "%s/%s/reversals/%s" % (base, cust_extn, extn)
 
     @classmethod
-    def modify(cls, sid, **params):
+    async def modify(cls, sid, **params):
         raise NotImplementedError(
             "Can't modify a reversal without a transfer"
             "ID. Call save on transfer.reversals.retrieve('reversal_id')"

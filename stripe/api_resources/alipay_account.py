@@ -1,11 +1,9 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import util
 from stripe.api_resources.customer import Customer
 from stripe.api_resources.abstract import DeletableAPIResource
 from stripe.api_resources.abstract import UpdateableAPIResource
 
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class AlipayAccount(UpdateableAPIResource, DeletableAPIResource):
@@ -26,9 +24,9 @@ class AlipayAccount(UpdateableAPIResource, DeletableAPIResource):
         return self._build_instance_url(self.customer, self.id)
 
     @classmethod
-    def modify(cls, customer, id, **params):
+    async def modify(cls, customer, id, **params):
         url = cls._build_instance_url(customer, id)
-        return cls._modify(url, **params)
+        return await cls._modify(url, **params)
 
     @classmethod
     def retrieve(

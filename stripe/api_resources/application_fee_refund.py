@@ -1,10 +1,8 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import util
 from stripe.api_resources import ApplicationFee
 from stripe.api_resources.abstract import UpdateableAPIResource
 
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class ApplicationFeeRefund(UpdateableAPIResource):
@@ -20,9 +18,9 @@ class ApplicationFeeRefund(UpdateableAPIResource):
         return "%s/%s/refunds/%s" % (base, cust_extn, extn)
 
     @classmethod
-    def modify(cls, fee, sid, **params):
+    async def modify(cls, fee, sid, **params):
         url = cls._build_instance_url(fee, sid)
-        return cls._modify(url, **params)
+        return await cls._modify(url, **params)
 
     def instance_url(self):
         return self._build_instance_url(self.fee, self.id)

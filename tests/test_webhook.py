@@ -1,11 +1,8 @@
-from __future__ import absolute_import, division, print_function
-
 import time
 
 import pytest
 
 import stripe
-from stripe import six
 
 
 DUMMY_WEBHOOK_PAYLOAD = """{
@@ -65,8 +62,6 @@ class TestWebhook(object):
     def test_construct_event_from_bytes(self):
         # This test is only applicable to Python 3 as `bytes` is not a symbol
         # in Python 2.
-        if six.PY2:
-            return
 
         header = generate_header()
         payload = bytes(DUMMY_WEBHOOK_PAYLOAD, "utf-8")

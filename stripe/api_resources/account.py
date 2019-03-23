@@ -1,14 +1,12 @@
-from __future__ import absolute_import, division, print_function
-
 import stripe
-from stripe import oauth, six, util
+from stripe import oauth, util
 from stripe.api_resources.abstract import CreateableAPIResource
 from stripe.api_resources.abstract import DeletableAPIResource
 from stripe.api_resources.abstract import UpdateableAPIResource
 from stripe.api_resources.abstract import ListableAPIResource
 from stripe.api_resources.abstract import nested_resource_class_methods
 
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 @nested_resource_class_methods(
@@ -34,8 +32,8 @@ class Account(
         return instance
 
     @classmethod
-    def modify(cls, id=None, **params):
-        return cls._modify(cls._build_instance_url(id), **params)
+    async def modify(cls, id=None, **params):
+        return await cls._modify(cls._build_instance_url(id), **params)
 
     @classmethod
     def _build_instance_url(cls, sid):
@@ -49,24 +47,24 @@ class Account(
     def instance_url(self):
         return self._build_instance_url(self.get("id"))
 
-    def persons(self, **params):
-        return self.request("get", self.instance_url() + "/persons", params)
+    async def persons(self, **params):
+        return await self.request("get", self.instance_url() + "/persons", params)
 
-    def reject(self, idempotency_key=None, **params):
+    async def reject(self, idempotency_key=None, **params):
         url = self.instance_url() + "/reject"
         headers = util.populate_headers(idempotency_key)
-        self.refresh_from(self.request("post", url, params, headers))
+        self.refresh_from(await self.request("post", url, params, headers))
         return self
 
-    def deauthorize(self, **params):
+    async def deauthorize(self, **params):
         params["stripe_user_id"] = self.id
-        return oauth.OAuth.deauthorize(**params)
+        return await oauth.OAuth.deauthorize(**params)
 
-    def serialize(self, previous):
+    async def serialize(self, previous):
         params = super(Account, self).serialize(previous)
         previous = previous or self._previous or {}
 
-        for k, v in six.iteritems(self):
+        for k, v in iter(self.items()):
             if (
                 k == "individual"
                 and isinstance(v, stripe.api_resources.Person)

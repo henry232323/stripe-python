@@ -1,9 +1,5 @@
-from __future__ import absolute_import, division, print_function
-
 import random
 import io
-
-from stripe import six
 
 
 class MultipartDataGenerator(object):
@@ -14,7 +10,7 @@ class MultipartDataGenerator(object):
         self.chunk_size = chunk_size
 
     def add_params(self, params):
-        for key, value in six.iteritems(params):
+        for key, value in iter(params.items()):
             if value is None:
                 continue
 
@@ -58,9 +54,9 @@ class MultipartDataGenerator(object):
         return self.data.getvalue()
 
     def _write(self, value):
-        if isinstance(value, six.binary_type):
+        if isinstance(value, bytes):
             array = bytearray(value)
-        elif isinstance(value, six.text_type):
+        elif isinstance(value, str):
             array = bytearray(value, encoding="utf-8")
         else:
             raise TypeError(

@@ -1,12 +1,10 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import error, util
 from stripe.api_resources.account import Account
 from stripe.api_resources.customer import Customer
 from stripe.api_resources.recipient import Recipient
 from stripe.api_resources.abstract import UpdateableAPIResource
 from stripe.api_resources.abstract import DeletableAPIResource
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class Card(UpdateableAPIResource, DeletableAPIResource):
@@ -47,7 +45,7 @@ class Card(UpdateableAPIResource, DeletableAPIResource):
         return "%s/%s/%s/%s" % (base, owner_extn, class_base, extn)
 
     @classmethod
-    def modify(cls, sid, **params):
+    async def modify(cls, sid, **params):
         raise NotImplementedError(
             "Can't modify a card without a customer, recipient or account "
             "ID. Call save on customer.sources.retrieve('card_id'), "

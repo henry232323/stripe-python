@@ -1,17 +1,15 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import error, util
 from stripe.api_resources import Customer
 from stripe.api_resources.abstract import CreateableAPIResource
 from stripe.api_resources.abstract import UpdateableAPIResource
 from stripe.api_resources.abstract import VerifyMixin
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class Source(CreateableAPIResource, UpdateableAPIResource, VerifyMixin):
     OBJECT_NAME = "source"
 
-    def detach(self, idempotency_key=None, **params):
+    async def detach(self, idempotency_key=None, **params):
         token = util.utf8(self.id)
 
         if hasattr(self, "customer") and self.customer:
@@ -22,7 +20,7 @@ class Source(CreateableAPIResource, UpdateableAPIResource, VerifyMixin):
             url = "%s/%s/sources/%s" % (base, owner_extn, extn)
             headers = util.populate_headers(idempotency_key)
 
-            self.refresh_from(self.request("delete", url, params, headers))
+            self.refresh_from(await self.request("delete", url, params, headers))
             return self
 
         else:
@@ -32,7 +30,7 @@ class Source(CreateableAPIResource, UpdateableAPIResource, VerifyMixin):
                 "id",
             )
 
-    def source_transactions(self, **params):
-        return self.request(
+    async def source_transactions(self, **params):
+        return await self.request(
             "get", self.instance_url() + "/source_transactions", params
         )

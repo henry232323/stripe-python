@@ -1,8 +1,6 @@
-from __future__ import absolute_import, division, print_function
-
-from stripe import error, util, six
+from stripe import error, util
 from stripe.stripe_object import StripeObject
-from stripe.six.moves.urllib.parse import quote_plus
+from urllib.parse import quote_plus
 
 
 class APIResource(StripeObject):
@@ -12,8 +10,8 @@ class APIResource(StripeObject):
         instance.refresh()
         return instance
 
-    def refresh(self):
-        self.refresh_from(self.request("get", self.instance_url()))
+    async def refresh(self):
+        self.refresh_from(await self.request("get", self.instance_url()))
         return self
 
     @classmethod
@@ -31,7 +29,7 @@ class APIResource(StripeObject):
     def instance_url(self):
         id = self.get("id")
 
-        if not isinstance(id, six.string_types):
+        if not isinstance(id, str):
             raise error.InvalidRequestError(
                 "Could not determine which URL to request: %s instance "
                 "has invalid ID: %r, %s. ID should be of type `str` (or"

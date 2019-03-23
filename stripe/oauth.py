@@ -1,7 +1,5 @@
-from __future__ import absolute_import, division, print_function
-
 from stripe import api_requestor, connect_api_base, error
-from stripe.six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 
 class OAuth(object):
@@ -37,18 +35,18 @@ class OAuth(object):
         return url
 
     @staticmethod
-    def token(**params):
+    async def token(**params):
         requestor = api_requestor.APIRequestor(api_base=connect_api_base)
-        response, api_key = requestor.request(
+        response, api_key = await requestor.request(
             "post", "/oauth/token", params, None
         )
         return response.data
 
     @staticmethod
-    def deauthorize(**params):
+    async def deauthorize(**params):
         requestor = api_requestor.APIRequestor(api_base=connect_api_base)
         OAuth._set_client_id(params)
-        response, api_key = requestor.request(
+        response, api_key = await requestor.request(
             "post", "/oauth/deauthorize", params, None
         )
         return response.data

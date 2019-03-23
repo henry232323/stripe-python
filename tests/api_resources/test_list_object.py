@@ -1,5 +1,3 @@
-from __future__ import absolute_import, division, print_function
-
 import json
 
 import pytest
@@ -115,7 +113,7 @@ class TestAutoPaging:
 
         request_mock.assert_no_request()
 
-        seen = [item["id"] for item in lo.auto_paging_iter()]
+        seen = [item["id"] for item in (lo.auto_paging_iter())]
 
         assert seen == ["pm_123", "pm_124"]
 
